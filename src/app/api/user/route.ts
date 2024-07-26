@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Client } from 'pg';
 import dotenv from 'dotenv';
+const bcrypt = require("bcrypt");
 
 dotenv.config();
 
@@ -19,12 +20,32 @@ export async function GET() {
     }
 }
 
-export async function POST() {
+export async function POST(req: NextResponse) {
     try {
-        return new Response(JSON.stringify({ message: "POST DATA OK" }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
+        const { firstname, lastname, username, password } = await req.json();
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log(hashedPassword);
+        const res = await client.query('INSERT INTO tbl_users (firstname, lastname, username, password) VALUES ($1, $2, $3, $4) RETURNING *', [firstname, lastname, username, hashedPassword]);
+        return NextResponse.json(res.rows);
+    } catch (error) {
+        console.error(error);
+        return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
         });
+    }
+}
+//-------------------------------------------------------------------------------------
+export async function PUT(req: Request) {
+    try {
+        const { firstname, lastname, id, password } = await req.json();
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const res = await client.query('UPDATE tbl_users SET firstname = $1, lastname = $2, password = $3 WHERE id = $4 RETURNING *', [firstname, lastname, hashedPassword, id]);
+        if(res.rows.length === 0) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+        return NextResponse.json({ message: 'User updated successfully' });
     } catch (error) {
         console.error(error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
@@ -34,27 +55,12 @@ export async function POST() {
     }
 }
 //-------------------------------------------------------------------------------------
-export async function PUT() {
+export async function DELETE(req: Request) {
     try {
-        return new Response(JSON.stringify({ message: "PUT DATA OK" }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
-    } catch (error) {
-        console.error(error);
-        return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-        });
-    }
-}
-//-------------------------------------------------------------------------------------
-export async function DELETE() {
-    try {
-        return new Response(JSON.stringify({ message: "DELETE DATA OK" }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-        });
+        const {id} = await req.json();
+        const res = await client.query('DELETE FROM tbl_users WHERE id = $1 RETURNING *', [id]);
+
+        return NextResponse.json({ message: 'User deleted successfully' });
     } catch (error) {
         console.error(error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
