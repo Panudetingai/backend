@@ -20,7 +20,7 @@ export async function GET() {
     }
 }
 
-export async function POST(req: NextResponse) {
+export async function POST(req: Request) {
     try {
         const { firstname, lastname, username, password } = await req.json();
         // Hash password
