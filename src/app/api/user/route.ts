@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         console.error(error);
         return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
             status: 500,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json'},
         });
     }
 }
@@ -50,7 +50,7 @@ export async function PUT(req: Request) {
         console.error(error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' },
         });
     }
 }
@@ -65,7 +65,7 @@ export async function DELETE(req: Request) {
         console.error(error);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' },
         });
     }
 }
