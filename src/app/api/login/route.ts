@@ -27,7 +27,11 @@ export async function POST(req: Request) {
         if (res.rows.length === 0) {
             return new Response(JSON.stringify({ error: 'User not found' }), {
                 status: 404,
-                headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+                headers: {
+                    'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'https://panudet-learnapp.vercel.app',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS', // ระบุ Methods ที่อนุญาต
+                    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With', // ระบุ Headers ที่อนุญาต
+                },
             });
         }
 
